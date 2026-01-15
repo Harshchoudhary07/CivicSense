@@ -4,6 +4,7 @@ import { getNearbyComplaints } from '../services/complaintService';
 import { getCurrentLocation } from '../utils/helpers';
 import { formatRelativeTime, getStatusClass, getPriorityClass } from '../utils/helpers';
 import { STATUS_LABELS, PRIORITY_LABELS, CATEGORIES } from '../utils/constants';
+import Map from '../components/Map';
 
 const NearbyIssues = () => {
     const [complaints, setComplaints] = useState([]);
@@ -82,17 +83,20 @@ const NearbyIssues = () => {
                     ))}
                 </div>
 
-                {/* Map Placeholder */}
-                <div className="map-container mb-xl" style={{ background: 'var(--gray-200)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className="text-center">
-                        <div style={{ fontSize: '3rem', marginBottom: 'var(--spacing-md)' }}>🗺️</div>
-                        <p style={{ color: 'var(--gray-600)' }}>
-                            Map view with {filteredComplaints.length} issues
-                        </p>
-                        <p style={{ fontSize: '0.875rem', color: 'var(--gray-500)', marginTop: 'var(--spacing-sm)' }}>
-                            (Google Maps integration - add API key to enable)
-                        </p>
-                    </div>
+                {/* Map View */}
+                <div className="map-container mb-xl" style={{ height: '400px', width: '100%' }}>
+                    <Map
+                        center={location}
+                        zoom={14}
+                        markers={filteredComplaints.map(complaint => ({
+                            lat: complaint.location?.lat,
+                            lng: complaint.location?.lng,
+                            title: complaint.category,
+                            onClick: () => setSelectedComplaint(complaint),
+                            // Optional: add info window content
+                        })).filter(m => m.lat && m.lng)}
+                        height="100%"
+                    />
                 </div>
 
                 {/* Issues List */}

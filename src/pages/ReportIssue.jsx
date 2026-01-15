@@ -7,6 +7,7 @@ import { getCurrentLocation } from '../utils/helpers';
 import { CATEGORIES } from '../utils/constants';
 import { useToast } from '../context/ToastContext';
 import { createNotification, NOTIFICATION_TYPES } from '../services/notificationService';
+import Map from '../components/Map';
 
 const ReportIssue = () => {
     const navigate = useNavigate();
@@ -209,18 +210,39 @@ const ReportIssue = () => {
                             {/* Location */}
                             <div className="form-group">
                                 <label className="form-label">Location *</label>
-                                <div className="flex gap-md">
+                                <div className="mb-md">
                                     <button
                                         type="button"
-                                        className="btn btn-secondary"
+                                        className="btn btn-secondary btn-sm mb-sm"
                                         onClick={handleGetLocation}
                                         disabled={locationLoading}
                                     >
                                         {locationLoading ? 'Getting Location...' : '📍 Use Current Location'}
                                     </button>
+                                    <p style={{ fontSize: '0.875rem', color: 'var(--gray-600)' }}>
+                                        Check the map to precise location
+                                    </p>
                                 </div>
+
+                                <div className="map-container mb-md" style={{ height: '300px' }}>
+                                    <Map
+                                        center={formData.location}
+                                        zoom={15}
+                                        onLocationSelect={async (loc) => {
+                                            setFormData(prev => ({ ...prev, location: loc }));
+                                            // Optional: You could call a geocoding API here to update address
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                address: `Lat: ${loc.lat.toFixed(6)}, Lng: ${loc.lng.toFixed(6)}`
+                                            }));
+                                        }}
+                                        markers={formData.location ? [{ lat: formData.location.lat, lng: formData.location.lng }] : []}
+                                        height="100%"
+                                    />
+                                </div>
+
                                 {formData.location && (
-                                    <div className="mt-md" style={{ background: 'var(--gray-100)', padding: 'var(--spacing-md)', borderRadius: 'var(--radius-md)' }}>
+                                    <div style={{ background: 'var(--gray-100)', padding: 'var(--spacing-md)', borderRadius: 'var(--radius-md)' }}>
                                         <p style={{ fontSize: '0.875rem', color: 'var(--gray-700)' }}>
                                             📍 {formData.address}
                                         </p>
